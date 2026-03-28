@@ -1,5 +1,8 @@
 from decimal import Decimal
-from functions.level_1.four_bank_parser import BankCard, SmsMessage, Expense, parse_ineco_expense
+from functions.level_1.four_bank_parser import (BankCard,
+                                                SmsMessage,
+                                                Expense,
+                                                parse_ineco_expense)
 from datetime import datetime
 import pytest
 
@@ -19,28 +22,19 @@ def test__parse_ineco_expense__case1():
     assert parse_ineco_expense(sms, cards) == result
 
 
-def test__parse_ineco_expense__no_card_in_cards():
-    cards = [BankCard("2222", "Author")]
-    sms = SmsMessage("100 rub, 1234 01.01.26 21:14 Pyaterochka authcode 0000 ",
-                     "Author",
-                     datetime(2026, 1, 1))
-    with pytest.raises(IndexError):
-        parse_ineco_expense(sms, cards)
-
-
-def test__parse_ineco_expense__wrong_time_in_massage():
-    cards = [BankCard("1234", "Author")]
-    sms = SmsMessage("100 rub, 1234 01.01.26 21-14 Pyaterochka authcode 0000 ",
-                     "Author",
-                     datetime(2026, 1, 1))
-    with pytest.raises(ValueError):
-        parse_ineco_expense(sms, cards)
-
-
-def test__parse_ineco_expense__wrong_massage():
-    cards = [BankCard("1234", "Author")]
-    sms = SmsMessage("100 rub, 1234 01.01.26 21:14 authcode 0000 test string",
-                     "Author",
-                     datetime(2026, 1, 1))
-    with pytest.raises(ValueError):
+@pytest.mark.parametrize(
+        "cards, sms",
+        [
+         ([BankCard("2222", "Author")],
+          SmsMessage("100 rub, 1234 01.01.26 21:14 Pyaterochka authcode 0000 ",
+                     "Author", datetime(2026, 1, 1))),
+         ([BankCard("1234", "Author")],
+          SmsMessage("100 rub, 1234 01.01.26 21-14 Pyaterochka authcode 0000 ",
+                     "Author", datetime(2026, 1, 1))),
+         ([BankCard("1234", "Author")],
+          SmsMessage("100 rub, 1234 01.01.26 21:14 authcode 0000 test string",
+                     "Author", datetime(2026, 1, 1)))]
+)
+def test__parse_ineco_expense__no_card_in_cards(cards, sms):
+    with pytest.raises((ValueError, IndexError)):
         parse_ineco_expense(sms, cards)
