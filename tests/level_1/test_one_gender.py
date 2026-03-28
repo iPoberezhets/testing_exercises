@@ -1,17 +1,11 @@
 from functions.level_1.one_gender import genderalize
+import pytest
 
 
-def test__genderalize__male():
-    verb_male = 'тестировал'
-    verb_female = 'тестировала'
-    gender = 'male'
-
-    assert genderalize(verb_male, verb_female, gender) == verb_male
-
-
-def test__genderalize__female():
-    verb_male = 'тестировал'
-    verb_female = 'тестировала'
-    gender = 'female'
-
-    assert genderalize(verb_male, verb_female, gender) == verb_female
+@pytest.mark.parametrize(
+    "verb_male, verb_female, gender, res",
+    [('тестировал', 'тестировала', 'male', 'тестировал'), 
+     ('тестировал', 'тестировала', 'female', 'тестировала')]
+)
+def test__genderalize__cases(verb_male, verb_female, gender, res):
+    assert genderalize(verb_male, verb_female, gender) == res
